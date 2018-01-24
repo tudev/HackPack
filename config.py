@@ -41,7 +41,7 @@ class ProductionConfig(Config):
     WELCOME_MSG = ['Welcome, ', 'Time to Hack, ', 'Hey there, ']
     REQUEST_EMAIL_SEND = 'tudev.hardware@temple.edu'
     REQUEST_EMAIL_ADMINS = ['tug64918@temple.edu']
-    SMTP = 'smtp.gmail.com:587'
+    SMTP = 'smtp.gmail.com'
     EMAIL_USER = os.getenv('EMAIL_USER')
     EMAIL_PASS = os.getenv('EMAIL_PASS')
 

@@ -345,7 +345,7 @@ def request_item():
 
         confirm_msg.set_payload(email_content)
 
-        email_server = smtplib.SMTP(app.config['SMTP'])
+        email_server = smtplib.SMTP(app.config['SMTP'], '587')
 
         email_server.starttls() 
         email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
