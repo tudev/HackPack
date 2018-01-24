@@ -64,7 +64,7 @@ button:focus, button:active, .btn:focus, .btn:active{
     background-color: white;
     margin-top: 20px;
     padding: 10px;
-    overflow-y: scroll;
+    overflow-y: hidden;
 }
 
 #overlay {
