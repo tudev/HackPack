@@ -172,10 +172,9 @@ def submit_request():
             user_name = full_account['name']
         else:
             user_name = None
-        email_server = smtplib.SMTP(app.config['SMTP'])
+        email_server = smtplib.SMTP(app.config['SMTP'], 25)
 
-        email_server.starttls() 
-        email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
+        email_server.starttls()
 
         order_msg = email.message.Message()
         order_msg['Subject'] = 'TUDev Hardware - Item Request'
@@ -345,10 +344,8 @@ def request_item():
 
         confirm_msg.set_payload(email_content)
 
-        email_server = smtplib.SMTP(app.config['SMTP'], '587')
-
-        email_server.starttls() 
-        email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
+        email_server = smtplib.SMTP(app.config['SMTP'], 25)
+        email_server.starttls()
         # send email
         email_server.sendmail(app.config['REQUEST_EMAIL_SEND'], email_account,
                               confirm_msg.as_string())
