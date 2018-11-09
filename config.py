@@ -15,7 +15,7 @@ class Config:
         pass
 
     CLIENT_ID = uuid5(NAMESPACE_DNS, gethostname())
-    VERSION = "1.0"
+    VERSION = "1.1"
     AUTHOR = "Jake Lawrence"
     NAME = "Checkout"
     HOSTNAME = gethostname()
@@ -33,11 +33,8 @@ class ProductionConfig(Config):
     SLACK_KEY = os.getenv('SLACK_KEY')
     CLIENT_ID = os.getenv('CLIENT_ID')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-    ADMIN_EMAILS = ['tug64918@temple.edu', 'tue95606@temple.edu',
-                    'ispicer@temple.edu', 'shetyeshail@gmail.com'
-                    'tuf84707@temple.edu', 'tug05029@temple.edu'
-                    'tug99025@temple.edu', 'dmcginnis@temple.edu',
-                    'rgregor@temple.edu']
+    ADMIN_EMAILS = ['tug64918@temple.edu', 'tug86304@temple.edu',
+                    'tug37553@temple.edu', 'tuf01128@temple.edu']
     WELCOME_MSG = ['Welcome, ', 'Time to Hack, ', 'Hey there, ']
     REQUEST_EMAIL_SEND = 'tudev.hardware@temple.edu'
     REQUEST_EMAIL_ADMINS = ['tug64918@temple.edu']
