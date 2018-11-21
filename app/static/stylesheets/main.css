@@ -56,11 +56,13 @@ button:focus, button:active, .btn:focus, .btn:active{
     height: 895px;
 }
 
+.long-box{}
+
 .auto{
     height: auto;
 }
 
-.xs-box, .sm-box, .md-box, .lg-box, .xl-box{
+.xs-box, .sm-box, .md-box, .lg-box, .xl-box, .long-box{
     background-color: white;
     margin-top: 20px;
     padding: 10px;
@@ -366,7 +368,8 @@ li{
 }
 
 @media (min-width: 992px){
-    .xs-box:hover, .sm-box:hover, .md-box:hover, .lg-box:hover, .xl-box:hover{
+    .xs-box:hover, .sm-box:hover, .md-box:hover, .lg-box:hover, .xl-box:hover,
+    .long-box:hover{
         -webkit-transition: .25s;
         -webkit-box-shadow: 0px 13px 33px -2px rgba(0,0,0,0.75);
         -moz-box-shadow: 0px 13px 33px -2px rgba(0,0,0,0.75);
@@ -425,6 +428,20 @@ li{
 
 
 /* admin stuff */
+.admin-order-pane{
+    max-height: 800px;
+    overflow-y: scroll;
+}
+
+.admin-order-view{
+    padding: 15px;
+    border-bottom: 1px dotted lightgrey;
+}
+
+.admin-order-view-footer{
+    color: grey;
+}
+
 .admin_ah{
     width: 45%;
     margin-top: 10px;

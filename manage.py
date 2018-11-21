@@ -8,11 +8,16 @@ import os
 from app import create_app
 from flask_script import Manager, Shell, Command, Option
 from pymongo import MongoClient
+from flask_moment import Moment
+
+
+
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 app.debug = True
 app.secret_key = os.urandom(32)
 
+moment = Moment(app)
 manager = Manager(app)
 mongo_url = 'mongodb://{0}:{1}@ds028310.mlab.com:28310/tudev_checkout'.format(app.config['DB_USER'],
                                                                               app.config['DB_PASS'])
@@ -49,4 +54,5 @@ def gunicorn(host, port, workers):
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
 if __name__ == '__main__':
+    moment.init_app(app)
     manager.run()

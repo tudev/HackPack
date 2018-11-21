@@ -6,11 +6,11 @@ import os
 import requests
 import smtplib
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import (abort, jsonify, g, session, render_template, redirect,
                    request, url_for)
 from functools import wraps
-from manage import app, client
+from manage import app, client, moment
 from random import randint
 from . import main
 
@@ -145,6 +145,7 @@ def submit_request():
     resp = {}
     resp['success'] = []
     resp['failed'] = []
+    ordered_items = []
     for item in data:
         item_name = data[item][0]
         item_quantity = int(data[item][1])
@@ -156,6 +157,8 @@ def submit_request():
                                     {'$set': {'quantity': new_quant}})
                 resp['success'].append({'name': item_name,
                                        'quantity': item_quantity})
+
+                ordered_items.append((stored_item['item_id'], item_quantity))
             else:
                 resp['failed'].append({'name': item_name,
                                        'quantity': item_quantity})
@@ -173,6 +176,50 @@ def submit_request():
         else:
             user_name = None
         email_server = smtplib.SMTP(app.config['SMTP'])
+
+        ''' add order to db '''
+
+        '''
+        order format:
+
+        {
+
+            id: 1234,
+
+            name: name_of_user_who_placed_order
+
+            email: email_of_user_who_placed_order,
+
+            time: <TIMESTAMP_AT_TIME_OF_ORDER>,
+
+            items: [(item_id, quantity).
+            
+            status: "pending" or "waiting for pickup" or "picked up" or "returned",
+
+            overdue: boolean,
+
+            pickup_time: <TIMESTAMP_OF_TIME_OF_PICKUP>,
+
+            return_time: <TIMESTAMP_OF_TIME_OF_RETURN>,
+
+            due_date: <TIMESTAMPE_OF_RETURN_DATE>
+
+        }
+        '''
+
+        db.orders.insert({
+                'id': str(uuid.uuid4())[:4],
+                'name': user_name,
+                'email': email_account,
+                'time': datetime.utcnow(),
+                'items': ordered_items,
+                'status': 'pending',
+                'pickup_time': None,
+                'return_time': None,
+                'overdue': False,
+                'due_date': datetime.utcnow() + timedelta(days=14)
+            })
+
 
         email_server.starttls() 
         email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
@@ -242,6 +289,41 @@ def admin():
         inventory_list.append(formatted_item)
     formatted_inventory = '\n'.join(inventory_list)
 
+    orders = db.orders.find()
+    
+    order_list = []
+    for order in orders:
+        formatted_items = ''
+        for item in order['items']:
+            formatted_items += '<li>{} <strong>x</strong> {}<li>'.format(item[0], item[1])
+
+        formatted_order = '''
+            <div class="admin-order-view" align="left">
+              <h5 class="admin-order-view-title">
+                <strong>Order ID: </strong> {0}
+              </h5>
+              <h5 class="admin-order-view-user">
+                <strong>User: </strong> {1}
+              </h5>
+              <h5 class="admin-order-view-email">
+                <strong>Email: </strong> {2}
+              </h5>
+              <h5 class="admin-order-view-items">
+                <strong style="text-decoration: underline;">Items</strong>
+                <ul class="admin-order-view-il">
+                  {3}
+                </ul>
+              </h5>
+              <i class="admin-order-view-footer">
+                Order placed on {4}
+              </i>
+            </div>
+            '''.format(order['id'], order['name'], order['email'],
+                       formatted_items,
+                       moment.create(order['time']).format('dddd, MMMM Do YYYY, h:mm a'))
+        order_list.append(formatted_order)
+    order_list = ''.join(order_list)
+
     hackathons = db.hackathons.find()
     hackathon_list = []
     for hackathon in hackathons:
@@ -274,7 +356,7 @@ def admin():
 
     return render_template('admin.html', inventory=formatted_inventory,
                            hackathons=formatted_hackathons, user=user,
-                           welcome_msg=welcome_msg)
+                           welcome_msg=welcome_msg, orders=order_list)
 
 @main.route('/authorize')
 def authorize():
@@ -314,10 +396,12 @@ def authorize():
 def request_item():
     data = request.form
     try:
+        # convert to strings so DB injection isn't even a possibility
         name = data['name']
         email_account = data['email']
         item = data['item']
         content = data['content']
+
         confirm_msg = email.message.Message()
         confirm_msg['Subject'] = 'Request Item - Request Recieved'
         confirm_msg['From'] = app.config['REQUEST_EMAIL_SEND']
