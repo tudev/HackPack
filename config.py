@@ -37,7 +37,7 @@ class ProductionConfig(Config):
                     'ispicer@temple.edu', 'shetyeshail@gmail.com'
                     'tuf84707@temple.edu', 'tug05029@temple.edu'
                     'tug99025@temple.edu', 'dmcginnis@temple.edu',
-                    'rgregor@temple.edu']
+                    'rgregor@temple.edu', 'tuf01128@temple.edu']
     WELCOME_MSG = ['Welcome, ', 'Time to Hack, ', 'Hey there, ']
     REQUEST_EMAIL_SEND = 'tudev.hardware@temple.edu'
     REQUEST_EMAIL_ADMINS = ['tug64918@temple.edu']
