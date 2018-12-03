@@ -1,338 +1,319 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="description"
-              content="TUDev HackPack, hardware hacking for all.">
-        <meta name="keywords"
-              content="TUDev,Temple University, Hardware, Hack">
-        <meta name="author" content="Jake Lawrence">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#9E1B34">
 
-        <title>TUDev HackPack</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/main.css') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="TUDev HackPack, hardware hacking for all.">
+  <meta name="keywords" content="TUDev,Temple University, Hardware, Hack">
+  <meta name="author" content="Jake Lawrence">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#9E1B34">
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/bootstrap.css') }}">
+  <title>TUDev HackPack</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/main.css') }}">
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/font-awesome.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/bootstrap.css') }}">
 
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/font-awesome.min.css') }}">
 
-        <link rel="icon" type="image/png" 
-              href="{{ url_for('static', filename='img/favicon.png') }}">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
 
-        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
 
-        <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
 
-        <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
-        {{ moment.include_moment() }}
-    </head>
-    <body>
-      <nav class="navbar navbar-toggleable-md navbar-light"
-             style="background-color: #9E1B34;">
-        <div style="width: 280px; margin-right: 0px">
-          <a href="https://hackpack.tudev.org"
-             style="display: inline-block;">
-          <img src="{{ url_for('static', filename='img/FullSplash.svg') }}"
-               class="logo">
-          </a>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+  {{ moment.include_moment() }}
+</head>
+
+<body>
+  <nav class="navbar navbar-toggleable-md navbar-light" style="background-color: #9E1B34;">
+    <div style="width: 280px; margin-right: 0px">
+      <a href="https://hackpack.tudev.org" style="display: inline-block;">
+        <img src="{{ url_for('static', filename='img/FullSplash.svg') }}" class="logo">
+      </a>
+    </div>
+    <span class="btn nav-dropdown-btn" id="dropdown-btn">
+      <h3><i class="fa fa-bars" aria-hidden="true"></i></h3>
+    </span>
+    <div class="mobile-dropdown" id="mobile-dropdown">
+      <ul class="dropdown-list">
+        <a class="dropdown-link" href="#get-started">
+          <li>
+            <i class="fa fa-play" aria-hidden="true"></i>
+            Get Started
+          </li>
+        </a>
+        <a class="dropdown-link" href="#learn-more">
+          <li>
+            <i class="fa fa-book" aria-hidden="true"></i>
+            Learn More
+          </li>
+        </a>
+        <a class="dropdown-link" href="{{ url_for('.index') }}"">
+              <li>
+                <i class=" fa
+          fa-home" aria-hidden="true"></i>
+          Main Page
+          </li>
+        </a>
+        <a class="dropdown-link" href="{{ url_for('.logout') }}"">
+              <li>
+                <i class=" fa
+          fa-sign-out" aria-hidden="true"></i>
+          Logout
+          </li>
+        </a>
+      </ul>
+    </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Get Started</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#learnmore">Learn More</a>
+        </li>
+      </ul>
+      <span class="nav-link" style="color: white">
+        {{ welcome_msg }} {{ user }} &bull;
+        <a href="{{ url_for('.index') }}" style="color: white; text-decoration: none">
+          Main Page
+        </a> &bull;
+        <a href="{{ url_for('.logout') }}" style="color: white; text-decoration: none">
+          <i class="fa fa-sign-out" aria-hidden="true"></i>Log Out
+        </a>
+      </span>
+    </div>
+  </nav>
+  <div class="container" style="min-height: 100%;">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+
+        <div class="col-md-12 xl-box" align="center">
+          <h2>Orders
+            <i class="fa fa-th-list" aria-hidden="true"></i>
+            <hr>
+          </h2>
+          <div class="admin-order-pane">
+            {% if orders %}
+            {{ orders|safe }}
+            {% else %}
+            No orders found
+            {% endif %}
+          </div>
         </div>
-        <span class="btn nav-dropdown-btn" id="dropdown-btn">
-          <h3><i class="fa fa-bars" aria-hidden="true"></i></h3>
-        </span>
-        <div class="mobile-dropdown" id="mobile-dropdown">
-          <ul class="dropdown-list">
-            <a class="dropdown-link" href="#get-started">
-              <li>
-                <i class="fa fa-play" aria-hidden="true"></i>
-                Get Started
-              </li>
-            </a>
-            <a class="dropdown-link" href="#learn-more">
-              <li>
-                <i class="fa fa-book" aria-hidden="true"></i>
-                Learn More
-              </li>
-            </a>
-            <a class="dropdown-link" href="{{ url_for('.index') }}"">
-              <li>
-                <i class="fa fa-home" aria-hidden="true"></i>
-                Main Page
-              </li>
-            </a>
-            <a class="dropdown-link" href="{{ url_for('.logout') }}"">
-              <li>
-                <i class="fa fa-sign-out" aria-hidden="true"></i>
-                Logout
-              </li>
-            </a>
-          </ul>
-        </div>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Get Started</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#learnmore">Learn More</a>
-            </li>
-          </ul>
-          <span class="nav-link" style="color: white">
-            {{ welcome_msg }} {{ user }} &bull; 
-            <a href="{{ url_for('.index') }}"
-               style="color: white; text-decoration: none">
-              Main Page
-            </a> &bull; 
-            <a href="{{ url_for('.logout') }}"
-               style="color: white; text-decoration: none">
-              <i class="fa fa-sign-out" aria-hidden="true"></i>Log Out
-            </a>
-          </span>
-        </div>
-      </nav>
-      <div class="container" style="min-height: 100%;">
-        <div class="row">
-          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
 
-            <div class="col-md-12 xl-box" align="center">
-              <h2>Orders
-                <i class="fa fa-th-list" aria-hidden="true"></i>
-                <hr>
-              </h2>
-              <hr>
-              <div class="admin-order-pane">
-                {% if orders %}
-                  {{ orders|safe }}
-                {% else %}
-                  No orders found
+        <div class="col-md-12 sm-box auto" align="center">
+          <h2>Hackathons with Hardware Hacks
+            <i class="fa fa-wrench" aria-hidden="true"></i>
+          </h2>
+          <hr style="margin-bottom: 0;">
+          <table class="table table-striped table-bordered" cellspacing="0" width="100%" id="hackathons">
+            <thead>
+              <tr>
+                <th>Hackathon</th>
+                <th class="hide-col-h">Location</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if hackathons %}
+              {{ hackathons|safe }}
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="col-xs-12 col-xm-12 col-md-12 col-lg-8">
+        <div class="col-md-12 md-box" align="center">
+          <h2>Inventory
+            <i class="fa fa-archive" aria-hidden="true"></i>
+          </h2>
+          <hr>
+          <div style="width: 100%; margin:0 auto;">
+            <table id="inventory_admin" class="table table-striped table-bordered" cellspacing="0" width="100%">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th class="hide-col">Quantity</th>
+                  <th class="hide-col">Reservation Length</th>
+                  <th class="hide-col">Category</th>
+                  <th class="hide-col">Tutorials</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if inventory %}
+                {{ inventory| safe }}
                 {% endif %}
-              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12  col-lg-6">
+            <div class="col-md-12 md-box auto" align="center">
+              <h1>Add Item</h1>
+              <hr>
+              <p>
+                To add an item, you must include all of the fields
+                below. When adding a hardware item be sure to run it
+                by Shail or Jake so they can approve the tutorial
+                link provided.
+              </p>
+              <form id="add_item" align="center">
+                <div align="center">
+                  <input id="item_name" class="admin_ai" type="text" placeholder="Item Name*" required>
+                  <input type="number" id="add_item_quant" name="quantity" min="0" max="50" placeholder="0">
+                  <input id="res_length" class="subadd" type="text" placeholder="Reservation Length*" required>
+                  <input id="item_category" class="subadd" type="text" placeholder="Category*" required>
+                  <input id="item_link" class="subadd" type="url" placeholder="Tutorial Link*" required>
+                  <input id="item_id" class="subadd" type="text" placeholder="ID" title="ID (Leave blank for new item)">
+                  <br>
+                  <span style="font-size: .7em; display: block;
+                                   color: grey;">
+                    (Leave ID blank for new item)
+                  </span>
+                </div>
+                <br>
+                <input type="submit" class="btn btn-info" value="Add Item">
+                <span id="add-item-gears" style="display: none;">
+                  <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
+                </span>
+              </form>
             </div>
 
             <div class="col-md-12 sm-box auto" align="center">
-              <h2>Hackathons with Hardware Hacks
-                <i class="fa fa-wrench" aria-hidden="true"></i>
-              </h2>
-              <hr style="margin-bottom: 0;">
-              <table class="table table-striped table-bordered"
-                     cellspacing="0" width="100%" id="hackathons">
-                <thead>
-                  <tr>
-                    <th>Hackathon</th>
-                    <th class="hide-col-h">Location</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% if hackathons %}
-                     {{ hackathons|safe }}
-                  {% endif %}
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-
-          <div class="col-xs-12 col-xm-12 col-md-12 col-lg-8">
-            <div class="col-md-12 md-box" align="center">
-              <h2>Inventory
-                <i class="fa fa-archive" aria-hidden="true"></i>
-              </h2>
+              <h1>Add Hackathon</h1>
               <hr>
-              <div style="width: 100%; margin:0 auto;">
-                <table id="inventory_admin"
-                      class="table table-striped table-bordered"
-                      cellspacing="0" width="100%">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Item</th>
-                      <th class="hide-col">Quantity</th>
-                      <th class="hide-col">Reservation Length</th>
-                      <th class="hide-col">Category</th>
-                      <th class="hide-col">Tutorials</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% if inventory %}
-                        {{ inventory| safe }}
-                    {% endif %}
-                  </tbody>
-                </table>
+              <p style="margin-bottom: 3px">
+                Fill out the form below to add a hackathon, all fields are
+                required.
+              </p>
+              <div>
+                <form id="add_hackathon">
+                  <input id="hackathon_name" class="admin_ah" type="text" placeholder="Hackathon Name*" required>
+                  <input id="location" class="admin_ah" type="text" placeholder="Location*" required>
+                  <br>
+                  <input id="date_range" class="admin_ah" type="text" placeholder="Date Range* (i.e. Sep. 5-7, 2017)"
+                    required>
+                  <input id="link" class="admin_ah" type="url" placeholder="Registration link*" required>
+                  <br>
+                  <br>
+                  <input type="submit" class="btn btn-info" value="Add Hackathon">
+                  <span id="add-hackathon-gears" style="display: none;">
+                    <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
+                  </span>
+                </form>
               </div>
             </div>
-            <div class="row">
-              <div class="col-xs-12 col-sm-12 col-md-12  col-lg-6">
-                <div class="col-md-12 md-box auto" align="center">
-                  <h1>Add Item</h1>
-                  <hr>
-                  <p>
-                    To add an item, you must include all of the fields
-                    below. When adding a hardware item be sure to run it
-                    by Shail or Jake so they can approve the tutorial 
-                    link provided.
-                  </p>
-                  <form id="add_item" align="center">
-                    <div align="center">
-                      <input id="item_name" class="admin_ai" type="text"
-                             placeholder="Item Name*" required>
-                      <input type="number" id="add_item_quant" name="quantity"
-                             min="0" max="50" placeholder="0">
-                      <input id="res_length" class="subadd" type="text"
-                             placeholder="Reservation Length*" required>
-                      <input id="item_category" class="subadd" type="text"
-                             placeholder="Category*" required>
-                      <input id="item_link" class="subadd" type="url"
-                             placeholder="Tutorial Link*" required>
-                      <input id="item_id" class="subadd" type="text"
-                             placeholder="ID"
-                             title="ID (Leave blank for new item)">
-                      <br>
-                      <span style="font-size: .7em; display: block;
-                                   color: grey;">
-                        (Leave ID blank for new item)
-                      </span>
-                    </div>
-                    <br>
-                    <input type="submit" class="btn btn-info" value="Add Item">
-                    <span id="add-item-gears" style="display: none;">
-                      <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
-                    </span>
-                  </form>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+            <div class="col-md-12 xs-box auto" align="center">
+              <h1>Increase Quantity of Item</h1>
+              <p>To add more of an item, you must provide a valid
+                item ID and the quantity of the item you are adding.
+              </p>
+              <form id="increase_quantity" align="center">
+                <div align="center">
+                  <input id="increase_item_id" class="subadd" type="text" placeholder="ID*" required>
+                  <input type="number" id="increase_item_quantity" name="quantity" min="1" max="50" placeholder="1"
+                    required>
                 </div>
-                
-                <div class="col-md-12 sm-box auto" align="center">
-                  <h1>Add Hackathon</h1>
-                  <hr>
-                  <p style="margin-bottom: 3px">
-                    Fill out the form below to add a hackathon, all fields are 
-                    required.
-                  </p>
-                  <div>
-                    <form id="add_hackathon">
-                        <input id="hackathon_name" class="admin_ah" type="text"
-                               placeholder="Hackathon Name*" required>
-                        <input id="location" class="admin_ah" type="text"
-                               placeholder="Location*" required>
-                        <br>
-                        <input id="date_range" class="admin_ah" type="text"
-                               placeholder="Date Range* (i.e. Sep. 5-7, 2017)" required>
-                        <input id="link" class="admin_ah" type="url"
-                               placeholder="Registration link*" required>
-                        <br>
-                        <br>
-                        <input type="submit" class="btn btn-info"
-                               value="Add Hackathon">
-                        <span id="add-hackathon-gears"
-                              style="display: none;">
-                          <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
-                        </span>
-                    </form>
-                  </div>
-                </div>     
-              </div>
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-                <div class="col-md-12 xs-box auto" align="center">
-                  <h1>Increase Quantity of Item</h1>
-                  <p>To add more of an item, you must provide a valid
-                    item ID and the quantity of the item you are adding.
-                  </p>
-                  <form id="increase_quantity" align="center">
-                    <div align="center">
-                        <input id="increase_item_id" class="subadd" type="text"
-                               placeholder="ID*" required>
-                        <input type="number" id="increase_item_quantity"
-                               name="quantity" min="1" max="50" placeholder="1"
-                               required>
-                    </div>
-                    <input type="submit" class="btn btn-warning"
-                           value="Add More">
-                    <span id="add-more-gears" style="display: none;">
-                      <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
-                    </span>
-                  </form>
+                <input type="submit" class="btn btn-warning" value="Add More">
+                <span id="add-more-gears" style="display: none;">
+                  <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
+                </span>
+              </form>
+            </div>
+            <div class="col-md-12 xs-box auto" align="center">
+              <h1>Remove Item</h1>
+              <p>
+                To remove an item, provide the item ID and the
+                amount you are removing below. Leave the amount blank
+                to remove all.
+              </p>
+              <form id="remove_item" align="center">
+
+                <div align="center">
+                  <input id="remove_item_id" class="subadd" type="text" placeholder="ID*" required>
+                  <input type="number" id="remove_item_quantity" name="quantity" min="0" max="50" placeholder="Q">
                 </div>
-                <div class="col-md-12 xs-box auto" align="center">
-                  <h1>Remove Item</h1>
-                  <p>
-                    To remove an item, provide the item ID and the
-                    amount you are removing below. Leave the amount blank
-                    to remove all.
-                  </p>
-                  <form id="remove_item" align="center">
 
-                    <div align="center">
-                      <input id="remove_item_id" class="subadd"
-                        type="text" placeholder="ID*" required>
-                      <input type="number" id="remove_item_quantity"
-                             name="quantity" min="0" max="50" placeholder="Q">
-                    </div>
+                <input type="submit" class="btn btn-danger" value="Remove Item">
 
-                    <input type="submit" class="btn btn-danger"
-                           value="Remove Item">
+                <span id="remove-item-gears" style="display: none;">
+                  <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
+                </span>
 
-                    <span id="remove-item-gears" style="display: none;">
-                      <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
-                    </span>
-
-                  </form>
-                </div>
-                <div class="col-md-12 sm-box auto" align="center">
-                  <h1>Remove Hackathon</h1>
-                  <hr>
-                  <p>
-                    To remove a hackathon, simply enter the name below
-                    and click remove. Keep in mind that all hackathons
-                    are removed once the date of the hackathon has passed.
-                  </p>
-                  <form id="remove_hackathon" align="center">
-                    <input id="r_hackathon_name" class="admin_rh" type="text"       placeholder="Hackathon Name*" required>
-                    <br>
-                    <br>
-                    <input type="submit" class="btn btn-danger"
-                           value="Remove Hackathon">
-                    <span id="remove-hackathon-gears" style="display: none;">
-                      <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
-                    </span>
-                  </form>
-                </div>
-              </div>
+              </form>
+            </div>
+            <div class="col-md-12 sm-box auto" align="center">
+              <h1>Remove Hackathon</h1>
+              <hr>
+              <p>
+                To remove a hackathon, simply enter the name below
+                and click remove. Keep in mind that all hackathons
+                are removed once the date of the hackathon has passed.
+              </p>
+              <form id="remove_hackathon" align="center">
+                <input id="r_hackathon_name" class="admin_rh" type="text" placeholder="Hackathon Name*" required>
+                <br>
+                <br>
+                <input type="submit" class="btn btn-danger" value="Remove Hackathon">
+                <span id="remove-hackathon-gears" style="display: none;">
+                  <p><i class="fa fa-cog fa-spin fa-fw"></i></p>
+                </span>
+              </form>
             </div>
           </div>
         </div>
       </div>
-      <div class="footer" align="center">
-        <span id="footer-text">
-          &copy; 2017 <a href="https://tudev.org">TUDev.org</a>  
-          <span class="shrink-hide">
-            -
-            <a href="mailto:tudev@temple.edu">
-            <i class="fa fa-envelope" aria-hidden="true"></i>
-            </a>
-            <a href="https://twitter.com/@templedev">
-              <i class="fa fa-twitter" aria-hidden="true"></i>
-            </a>
-            <a href="https://www.facebook.com/TUDevClub/">
-              <i class="fa fa-facebook-official" aria-hidden="true"></i>
-            </a>
-            <a href="https://github.com/tudev/hackpack">
-              <i class="fa fa-github-alt" aria-hidden="true"></i>
-            </a>
-            <a href="https://blog.tudev.org">
-              <i class="fa fa-medium" aria-hidden="true"></i>
-            </a>
-            - Made with 
-            <i class="fa fa-code" aria-hidden="true"></i>
-            by <a href="https://lawja.io" class="underline">Jake</a>
-            and help from <a href="https://tudev.org/#who"
-                             class="underline">these cool people</a>
-          </span>
-        </span>
-      </div>
-    </body>
-    <footer>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
-    </footer>
+    </div>
+  </div>
+  <div class="footer" align="center">
+    <span id="footer-text">
+      &copy; 2017 <a href="https://tudev.org">TUDev.org</a>
+      <span class="shrink-hide">
+        -
+        <a href="mailto:tudev@temple.edu">
+          <i class="fa fa-envelope" aria-hidden="true"></i>
+        </a>
+        <a href="https://twitter.com/@templedev">
+          <i class="fa fa-twitter" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.facebook.com/TUDevClub/">
+          <i class="fa fa-facebook-official" aria-hidden="true"></i>
+        </a>
+        <a href="https://github.com/tudev/hackpack">
+          <i class="fa fa-github-alt" aria-hidden="true"></i>
+        </a>
+        <a href="https://blog.tudev.org">
+          <i class="fa fa-medium" aria-hidden="true"></i>
+        </a>
+        - Made with
+        <i class="fa fa-code" aria-hidden="true"></i>
+        by <a href="https://lawja.io" class="underline">Jake</a>
+        and help from <a href="https://tudev.org/#who" class="underline">these cool people</a>
+      </span>
+    </span>
+  </div>
+  <div class="alert-overlay">
+    <span id="alert-content">
+      You must be logged in to make a hardware request
+    </span>
+    <button id="alert-button" class="btn" style="border: none; background: none; color: red;">
+      X
+    </button>
+  </div>
+</body>
+<footer>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</footer>
+
 </html>

@@ -116,7 +116,7 @@ def admin_required(f):
             if session['user'] in app.config['ADMIN_EMAILS']:
                 return f(*args, **kwargs)
         return redirect(url_for('.index'))
-        return f(*args, **kwargs)
+        
     return decorated_function
 
 def login_required(f):
@@ -265,6 +265,50 @@ def submit_request():
 
     return jsonify(resp)
 
+
+@main.route('/update_order', methods=['POST'])
+@admin_required
+def update_order():
+    '''
+        updates an order's status through POST request params
+
+        POST params
+            {
+                'id': string,
+                'email': string,
+                'new_status': string
+            }
+    '''
+
+    params = request.data
+    print(params)
+    try:
+        db = client.tudev_checkout
+
+        # sanitize request params input so we don't insert raw data types to the
+        # db, mitigates any possibility of db injection
+        order_id = str(params['id'])
+        order_email = str(params['email'])
+        new_status = str(params['new_status'])
+
+        order_exists = db.orders.find({'$and': [{'id': order_id},
+                                                {'email': order_email}]})
+
+        if(not(order_exists)):
+            abort(404)
+
+        print(new_status)
+        '''
+        db.orders.update({'$and': [{'id': order_id},
+                                   {'email': order_email}]},
+                         {'$set': {
+                             'status': new_status
+                         }})
+        '''
+        
+    except KeyError:
+        abort(400)
+
 @main.route('/admin')
 @admin_required
 def admin():
@@ -297,8 +341,30 @@ def admin():
         for item in order['items']:
             formatted_items += '<li>{} <strong>x</strong> {}<li>'.format(item[0], item[1])
 
+        overdue_str = ''
+        if(datetime.now() > order['due_date']):
+            overdue_str = '<span class="admin-order-overdue">Overdue</span>'
+
+        action_str= ''
+
+        if(order['status'] == 'pending'):
+            action_str = '''
+                <span class="admin-order-action rfpu" name="{1}" id="{0}">
+                    Ready for pickup?
+                </span>'''.format(order['id'], order['email'])
+        
+        return_str = ''
+        if(order['status'] != 'returned'):
+            return_str = '''
+                <span class="admin-order-return" name="{1}" id="{0}">
+                  Return
+                </span>'''.format(order['id'], order['email'])
+
         formatted_order = '''
             <div class="admin-order-view" align="left">
+              <span class="admin-order-status">{5}</span>
+              {6}<div class="aob"></div>{7}
+
               <h5 class="admin-order-view-title">
                 <strong>Order ID: </strong> {0}
               </h5>
@@ -314,13 +380,15 @@ def admin():
                   {3}
                 </ul>
               </h5>
+              {8}<div class="aob"></div>
               <i class="admin-order-view-footer">
                 Order placed on {4}
               </i>
             </div>
             '''.format(order['id'], order['name'], order['email'],
                        formatted_items,
-                       moment.create(order['time']).format('dddd, MMMM Do YYYY, h:mm a'))
+                       moment.create(order['time']).format('dddd, MMMM Do YYYY, h:mm a'),
+                       order['status'], overdue_str, action_str, return_str)
         order_list.append(formatted_order)
     order_list = ''.join(order_list)
 

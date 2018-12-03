@@ -30,7 +30,6 @@ button:focus, button:active, .btn:focus, .btn:active{
     color: #c0264c;
 }
 
-
 .container{
     width: 100% !important;
     margin-bottom: 20px;
@@ -437,9 +436,64 @@ li{
     padding: 15px;
     border-bottom: 1px dotted lightgrey;
 }
+.admin-order-view-title{
+    margin-top: 10px;
+}
 
 .admin-order-view-footer{
     color: grey;
+}
+
+.admin-order-status{
+    padding: 5px;
+    background-color: grey;
+    color: white;
+    text-transform: uppercase;
+    width: auto;
+    font-weight: bold;
+}
+
+.admin-order-overdue{
+    padding: 5px;
+    background-color: #e74c3c;
+    color: white;
+    text-transform: uppercase;
+    width: auto;
+    font-weight: bold;
+}
+
+.aob{
+    height:10px;
+}
+
+.admin-order-action{
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #2ecc71;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: .2s ease background-color;
+}
+
+.admin-order-action:hover{
+    cursor: pointer;
+    background-color: #27ae60;
+}
+
+.admin-order-return{
+   border-radius: 5px;
+    padding: 5px;
+    background-color: #3498db;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: .2s ease background-color; 
+}
+
+.admin-order-return:hover{
+    cursor: pointer;
+    background-color: #2980b9;
 }
 
 .admin_ah{
