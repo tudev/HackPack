@@ -280,7 +280,7 @@ def update_order():
             }
     '''
 
-    params = request.data
+    params = request.form
     print(params)
     try:
         db = client.tudev_checkout
@@ -291,23 +291,160 @@ def update_order():
         order_email = str(params['email'])
         new_status = str(params['new_status'])
 
-        order_exists = db.orders.find({'$and': [{'id': order_id},
-                                                {'email': order_email}]})
+        order_exists = db.orders.find_one({'$and': [{'id': order_id},
+                                                    {'email': order_email}]})
 
         if(not(order_exists)):
             abort(404)
-
-        print(new_status)
-        '''
+        
         db.orders.update({'$and': [{'id': order_id},
                                    {'email': order_email}]},
                          {'$set': {
                              'status': new_status
                          }})
-        '''
+
         
+        if(new_status == 'waiting for pickup'):
+
+            email_server = smtplib.SMTP(app.config['SMTP'])
+            email_server.starttls()
+            email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
+
+            # send email telling them they pick up order
+            order_msg = email.message.Message()
+            order_msg['Subject'] = 'TUDev HackPack - Order Ready for Pickup'
+            order_msg['From'] = app.config['EMAIL_USER']
+            order_msg['To'] = order_email
+            order_msg.add_header('Content-Type', 'text/html')
+
+            email_content = '''
+                <html>
+                    <body>
+                        <p>Hey there!</p>
+                        <p>
+                          Order <strong>{0}</strong> is now ready for pickup
+                          Stop by SERC 360 anytime from 9-5pm M-F to pick it up.
+                        </p>
+                        <p>Happy Hacking!</p>
+                        <p>TUDev</p>
+                    </body>
+                </html>'''.format(order_id)
+
+            order_msg.set_payload(email_content)
+            email_server.sendmail(app.config['EMAIL_USER'],
+                                  order_email, order_msg.as_string())
+
+        elif(new_status == 'picked up'):
+            email_server = smtplib.SMTP(app.config['SMTP'])
+            email_server.starttls()
+            email_server.login(app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
+
+            # send email telling them they pick up order
+            order_msg = email.message.Message()
+            order_msg['Subject'] = 'TUDev HackPack - Order Picked Up'
+            order_msg['From'] = app.config['EMAIL_USER']
+            order_msg['To'] = order_email
+            order_msg.add_header('Content-Type', 'text/html')
+
+            email_content = '''
+                <html>
+                    <body>
+                        <p>Hey there!</p>
+                        <p>
+                          This is a confirmation email in regard to Order {0}.
+                        </p>
+                        <p>Happy Hacking!</p>
+                        <p>TUDev</p>
+                    </body>
+                </html>'''.format(order_id)
+
+            order_msg.set_payload(email_content)
+            email_server.sendmail(app.config['EMAIL_USER'],
+                                  order_email, order_msg.as_string())
+        elif(new_status == 'returned'):
+            for item in order_exists['items']:
+                db.inventory.update_one({'item_id': item[0]},
+                                        {
+                                            '$inc':{
+                                                'quantity': int(item[1])
+                                            }
+                                        })
+        
+        
+        return jsonify({'status': 'order updated'})
     except KeyError:
         abort(400)
+
+@main.route('/remind_user', methods=['POST'])
+@admin_required
+def remind_user():
+    db = client.tudev_checkout
+
+    data = request.form
+
+    print(data)
+
+    try:
+        order_id = data['id']
+        order_email = data['email']
+
+        order_exists = db.orders.find_one({'$and': [{'id': order_id},
+                                                    {'email': order_email}]})
+
+        if(not(order_exists)):
+            abort(404)
+
+        email_server = smtplib.SMTP(app.config['SMTP'])
+        email_server.starttls()
+        email_server.login(
+            app.config['EMAIL_USER'], app.config['EMAIL_PASS'])
+
+        # send email telling them they pick up order
+        order_msg = email.message.Message()
+        order_msg['Subject'] = 'TUDev HackPack - Order Reminder'
+        order_msg['From'] = app.config['EMAIL_USER']
+        order_msg['To'] = order_email
+        order_msg.add_header('Content-Type', 'text/html')
+
+        if(order_exists['status'] == 'waiting for pickup'):
+            email_content = '''
+                <html>
+                    <body>
+                        <p>Hey there!</p>
+                        <p>
+                            Just a reminder that order {0} is available for pickup.
+                            If the order is not picked up before it's due back,
+                            the order will be automatically restocked into our
+                            system. Stop by SERC 360 from 9-5pm M-F to pick it
+                            up.
+                        </p>
+                        <p>Happy Hacking!</p>
+                        <p>TUDev</p>
+                    </body>
+                </html>'''.format(order_id)
+        else:
+            email_content = '''
+                <html>
+                    <body>
+                        <p>Hey there!</p>
+                        <p>
+                            Just a reminder that order {0} is overdue and must
+                            be returned to TUDev. Stop by SERC 360 from 9-5pm
+                            M-F to drop it off.
+                        </p>
+                        <br>
+                        <p>TUDev</p>
+                    </body>
+                </html>'''.format(order_id)
+
+        order_msg.set_payload(email_content)
+        email_server.sendmail(app.config['EMAIL_USER'],
+                                order_email, order_msg.as_string())
+        
+        return jsonify({'status': 'reminded user'})
+    except KeyError:
+        abort(400)
+
 
 @main.route('/admin')
 @admin_required
@@ -341,29 +478,46 @@ def admin():
         for item in order['items']:
             formatted_items += '<li>{} <strong>x</strong> {}<li>'.format(item[0], item[1])
 
+        notify_str = ''
+
         overdue_str = ''
-        if(datetime.now() > order['due_date']):
+        if(datetime.now() > order['due_date'] and order['status'] != 'returned'):
             overdue_str = '<span class="admin-order-overdue">Overdue</span>'
+            notify_str = '''
+                <span class="admin-order-remind" id="{0}" title="{1}">
+                    Remind user
+                </span>
+                '''.format(order['id'], order['email'])
 
         action_str= ''
 
         if(order['status'] == 'pending'):
             action_str = '''
-                <span class="admin-order-action rfpu" name="{1}" id="{0}">
+                <span class="admin-order-action rfpu" title="{1}" id="{0}">
                     Ready for pickup?
                 </span>'''.format(order['id'], order['email'])
+        elif(order['status'] == 'waiting for pickup'):
+            action_str = '''
+                <span class="admin-order-action ofpu" title="{1}" id="{0}">
+                    Picked up?
+                </span>'''.format(order['id'], order['email'])
+            notify_str = '''
+                <span class="admin-order-remind" id="{0}" title="{1}">
+                    Remind user
+                </span>
+                '''.format(order['id'], order['email'])
         
         return_str = ''
         if(order['status'] != 'returned'):
             return_str = '''
-                <span class="admin-order-return" name="{1}" id="{0}">
+                <span class="admin-order-action admin-order-return" title="{1}" id="{0}">
                   Return
                 </span>'''.format(order['id'], order['email'])
 
         formatted_order = '''
             <div class="admin-order-view" align="left">
               <span class="admin-order-status">{5}</span>
-              {6}<div class="aob"></div>{7}
+              {6}<div class="aob"></div>{7}{9}
 
               <h5 class="admin-order-view-title">
                 <strong>Order ID: </strong> {0}
@@ -388,7 +542,8 @@ def admin():
             '''.format(order['id'], order['name'], order['email'],
                        formatted_items,
                        moment.create(order['time']).format('dddd, MMMM Do YYYY, h:mm a'),
-                       order['status'], overdue_str, action_str, return_str)
+                       order['status'], overdue_str, action_str, return_str,
+                       notify_str)
         order_list.append(formatted_order)
     order_list = ''.join(order_list)
 

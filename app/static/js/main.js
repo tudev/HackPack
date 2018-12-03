@@ -331,21 +331,45 @@ $(document).ready(function () {
         window.location.reload();
     });
 
+    $(document).on('click', '.admin-order-remind', function (event) {
+        $.ajax({
+            data: {
+                'id': this.id,
+                'email': this.title
+            },
+            type: 'POST',
+            url: '/remind_user',
+            error: function (xhr) {
+                var msg = "Unable to remind user";
+                $(".alert-overlay").css("display", "inline-block");
+                $("#alert-content").empty()
+                $("#alert-content").html(msg)
+                event.preventDefault();
+            }
+        }).done(function (data) {
+
+        });
+    });
+
     $(document).on('click', '.admin-order-action', function (event) {
         let actionObj = this;
         let new_status = '';
 
-        if (actionObj.classList.includes('rfpu')) {
+        if (actionObj.classList.contains('rfpu')) {
             new_status = 'waiting for pickup'
-        } else if (actionObj.classList.includes('admin-order-return')) {
+        } else if (actionObj.classList.contains('ofpu')) {
+            new_status = 'picked up'
+        } else if (actionObj.classList.contains('admin-order-return')) {
             new_status = 'returned'
         }
+
+        console.dir(actionObj);
 
         $.ajax({
             data: {
                 'id': actionObj.id,
                 'new_status': new_status,
-                'email': actionObj.name
+                'email': actionObj.title
             },
             type: 'POST',
             url: '/update_order',

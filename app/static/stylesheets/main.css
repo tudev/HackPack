@@ -55,8 +55,6 @@ button:focus, button:active, .btn:focus, .btn:active{
     height: 895px;
 }
 
-.long-box{}
-
 .auto{
     height: auto;
 }
@@ -474,6 +472,7 @@ li{
     text-transform: uppercase;
     font-weight: bold;
     transition: .2s ease background-color;
+    margin-right: 5px;
 }
 
 .admin-order-action:hover{
@@ -482,7 +481,7 @@ li{
 }
 
 .admin-order-return{
-   border-radius: 5px;
+    border-radius: 5px;
     padding: 5px;
     background-color: #3498db;
     color: white;
@@ -494,6 +493,21 @@ li{
 .admin-order-return:hover{
     cursor: pointer;
     background-color: #2980b9;
+}
+
+.admin-order-remind{
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #f1c40f;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: .2s ease background-color; 
+}
+
+.admin-order-remind:hover{
+    background-color: #f39c12;
+    cursor: pointer;
 }
 
 .admin_ah{
