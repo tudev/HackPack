@@ -510,6 +510,11 @@ li{
     cursor: pointer;
 }
 
+.admin-order-check{
+    text-align: right;
+    margin: 0;
+}
+
 .admin_ah{
     width: 45%;
     margin-top: 10px;

@@ -97,11 +97,15 @@
             <i class="fa fa-th-list" aria-hidden="true"></i>
             <hr>
           </h2>
+          <div class="admin-order-check">
+            <input type="checkbox" id="admin-order-show-returned" checked="" />
+            <label for="admin-order-show-returned">Show Returned Orders</label>
+          </div>
           <div class="admin-order-pane">
             {% if orders %}
-            {{ orders|safe }}
+              {{ orders|safe }}
             {% else %}
-            No orders found
+              No orders found
             {% endif %}
           </div>
         </div>

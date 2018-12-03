@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    const baseOrders = $('.admin-order-pane').html();
     $('#inventory').DataTable({
         "paging": false,
         "autoWidth": false,
@@ -385,6 +386,21 @@ $(document).ready(function () {
         });
 
         event.preventDefault();
+    });
+
+    $(document).on('click', '#admin-order-show-returned', function(event){
+        console.log(this.checked)
+        if(!(this.checked)){
+            $('.admin-order-view').each(function(i, element){
+                if(element.children[0].innerText === 'RETURNED'){
+                    $(element).hide();
+                }
+            });
+        }else{
+            $('.admin-order-pane').empty();
+            $('.admin-order-pane').html(baseOrders);
+        }
+        console.dir(this);
     });
 
 });
